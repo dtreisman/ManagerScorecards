@@ -1,0 +1,65 @@
+name: manager-scorecard-bot
+
+on:
+  schedule:
+    - cron: '0 14 * * *' # runs at 14:00 UTC (8am Central) everyday
+    
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: true
+        default: 'warning' 
+        type: choice
+        options:
+        - info
+        - warning
+        - debug 
+      tags:
+        description: 'Test scenario tags'
+        required: false 
+        type: boolean
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true 
+
+          
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: checkout repo content
+        uses: actions/checkout@v2 # checkout the repository content to github runner
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: ${{ matrix.config.r }}
+          http-user-agent: ${{ matrix.config.http-user-agent }}
+          use-public-rspm: true
+          
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          cache-version: 1
+          extra-packages: |
+            rvest
+            tidyverse
+            gt
+            baseballr
+            lubridate
+            slider
+            randomForest
+
+      - name: Run daily data pull
+        run: Rscript -e 'source("02-get_daily_results.R")'
+          
+      - name: commit files
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "update data" -a
+          git push origin main
+        
