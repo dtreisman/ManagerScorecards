@@ -20,6 +20,6 @@ The second model is the expected pitching change model. The model was trained us
 The final statistic (xRuns Lost) can be defined as:
 > (max(xRuns<sub>hypothetical</sub>) - xRuns<sub>current</sub>) * abs(is_currently_pitching(0 or 1) - prob_new_pitcher)
 
-This methodology assumes that all relievers are available and no starters are available. For each situation, a pitcher is not considered available if they pitched earlier in the game. In the playoffs, values will not reflect starting pitchers that pitch in relief.
+This methodology assumes that all relievers are available and no starters are available. For each situation, a pitcher is not considered available if they pitched earlier in the game. In the playoffs, values will not reflect starting pitchers that are available to pitch in relief.
 
 This is currently the soft-launch/beta-test of the product. More methodology details will be updated in the coming weeks.
