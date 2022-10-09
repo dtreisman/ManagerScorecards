@@ -29,6 +29,11 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    env:
+      TWITTERACCESSTOKEN: ${{ secrets.TWITTERACCESSTOKEN }}
+      TWITTERACCESSTOKENSECRET: ${{ secrets.TWITTERACCESSTOKENSECRET }}
+      TWITTERAPIKEY: ${{ secrets.TWITTERAPIKEY }}
+      TWITTERAPISECRET: ${{ secrets.TWITTERAPISECRET }}
     steps:
 
       - name: checkout repo content
