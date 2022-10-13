@@ -159,13 +159,12 @@ if (nrow(new_games > 0)) {
   pb_download(file = "expected_runs_model.Rds", repo = repo, dest = "./models", 
               overwrite = T, tag = models_tag)
   fit_runs <- readRDS("models/expected_runs_model.Rds")
-  pb_upload(file = "models/expected_runs_model.Rds", repo = repo, tag = models_tag, overwrite = T)
+  # pb_upload(file = "models/expected_runs_model.Rds", repo = repo, tag = models_tag, overwrite = T)
   
   pb_download(file = "expected_pitching_change_model.Rds", repo = repo, dest = "./models", 
               overwrite = T, tag = models_tag)
   fit_new_pitcher <- readRDS("models/expected_pitching_change_model.Rds")
-  pb_upload(file = "models/expected_pitching_change_model.Rds", repo = repo, 
-            tag = models_tag, overwrite = T)
+  # pb_upload(file = "models/expected_pitching_change_model.Rds", repo = repo,  tag = models_tag, overwrite = T)
   
   pred_wp <- predict(fit_wp, df_pred, type = "response")
   pred_runs <- predict(fit_runs, df_pred)
