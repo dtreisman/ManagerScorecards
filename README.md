@@ -1,4 +1,6 @@
 # Manager Scorecards
+
+Ignore...
 [![manager-scorecard-bot](https://github.com/dtreisman/ManagerScorecards/actions/workflows/daily_run.yml/badge.svg)](https://github.com/dtreisman/ManagerScorecards/actions/workflows/daily_run.yml)
 
 10-07-2022
@@ -15,5 +17,9 @@ Predictions were made for expected runs for all plate appearances. Predictions w
 
 The second model is the expected pitching change model. The model was trained using similar variables as the model above in order to predict a probability of a pitching change. In order to not over-penalize a manager for making a substitution, the expected runs values were adjusted by whether a pitching change was likely. A manager will get credited (penalized) for more expected runs lost if a pitching change was highly unexpected, and less penalty if the pitching change was likely given the situation.
 
+The final statistic (xRuns Lost) can be defined as:
+> (max(xRuns<sub>hypothetical</sub>) - xRuns<sub>current</sub>) * abs(is_currently_pitching(0 or 1) - prob_new_pitcher)
+
+This methodology assumes that all relievers are available and no starters are available. For each situation, a pitcher is not considered available if they pitched earlier in the game. In the playoffs, values will not reflect starting pitchers that are available to pitch in relief.
 
 This is currently the soft-launch/beta-test of the product. More methodology details will be updated in the coming weeks.
