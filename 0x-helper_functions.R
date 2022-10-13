@@ -114,8 +114,7 @@ prepareNewData <- function(df) {
   return(df)
 }
 
-df_new %>%
-  count(game_date)
+
 augmentNewData <- function(df_new){
   df_new <- df_new %>%
     select(-c(events, description, home_team, away_team, home_score, away_score,
@@ -261,8 +260,8 @@ write_tweet <- function(id, df_output, dist_history){
     away_score <- output$teams_home_score
     home_score <- output$teams_away_score
     
-    h_percentile <- round(mean(deframe(output[,5]) > dist_history$runs_diff) * 100)
-    a_percentile <- round(mean(deframe(output[,6]) > dist_history$runs_diff) * 100)
+    h_percentile <- round(mean(deframe(output[,5]) < dist_history$runs_diff_adj) * 100)
+    a_percentile <- round(mean(deframe(output[,6]) < dist_history$runs_diff_adj) * 100)
     
     tweet <- glue::glue(
       

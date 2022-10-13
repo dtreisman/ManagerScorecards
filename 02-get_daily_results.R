@@ -3,66 +3,98 @@ library(baseballr)
 library(tidyverse)
 library(lubridate)
 library(slider)
+library(rtweet)
 library(randomForest)
-library(googledrive)
-
-source("0x-helper_functions.R")
-
-
-# Get pre-scraped active rosters with positions
-rosters <- read_csv(url("https://github.com/dtreisman/DailyMLBRosters/raw/main/data/DailyMLBRosters.csv"))
-pitchers <- rosters %>% 
-  filter(pos %in% c("SP", "RP")) %>%
-  mutate(team_abbr = str_to_upper(team_abbr)) %>%
-  select(name, pos, jersey, bats, throws, team_abbr, date, player_id) %>%
-  mutate(date = lubridate::as_date(date),
-         jersey = as.numeric(jersey))
+library(piggyback)
+# library(googledrive)
+try(
+  source("0x-helper_functions.R"),
+  silent = F)
+# api_key <- Sys.getenv("TWITTERAPIKEY")
+# api_secret <- Sys.getenv("TWITTERAPISECRET")
+# access_token <- Sys.getenv("TWITTERACCESSTOKEN")
+# access_secret <- Sys.getenv("TWITTERACCESSTOKENSECRET")
 
 
-# get MLB.com active rosters
-al_teams <- tibble(baseballr::mlb_teams(season = 2022, league_ids = c(103)))
-nl_teams <- tibble(baseballr::mlb_teams(season = 2022, league_ids = c(104)))
-al_teams[which(al_teams$team_abbreviation == "CWS"), "team_abbreviation"] <- "CHW"
+auth <- rtweet::rtweet_bot(api_key = "HGv6svtblp2qczsKatTx7zm0A",
+                           api_secret = "kyLVZl5rZUu1uoaam1HRFcDyeKNZ3qj8GHtkYAFHO81xIVHK46", 
+                           access_token = "1571933700153032714-HD4LcRZONCLBrQfGs8zum453H3qUby", 
+                           access_secret = "Fv6DEXmAz9a00kUtpNMr3eNSjqjYwre4kqOvWEP4NGWMh")
 
-mlb_rosters <- tibble()
-for (day in seq.Date(Sys.Date()-1, Sys.Date()-1, by = "1 day")) { # seq.Date(Sys.Date()-9, Sys.Date()-9, by = "1 day")) {
-  print(as_date(day))
-  for (i in 1:length(c(al_teams$team_abbreviation, nl_teams$team_abbreviation))) {
-    abbrs <- c(al_teams$team_abbreviation, nl_teams$team_abbreviation)
-    ids <- c(al_teams$team_id, nl_teams$team_id)
-    #print(abbrs[i])
-    temp <- mlb_rosters(team_id = c(ids[i]), season = 2022, roster_type = 'active', date = as_date(day))
-    
-    temp <- temp %>% 
-      select(person_id, person_full_name, jersey_number) %>%
-      mutate(jersey_number = as.numeric(jersey_number))
-    temp$date <- as_date(day)
-    temp$team <- abbrs[i]
-    mlb_rosters <- bind_rows(mlb_rosters, temp)
-  }
-  
-}
-
-all_mlb_rosters <- readRDS("data/MLBRosters.Rds")
-all_mlb_rosters <- bind_rows(all_mlb_rosters, mlb_rosters)
-saveRDS(object = all_mlb_rosters, file = "data/MLBRosters.Rds")
+rtweet::auth_as(auth)
 
 new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-1, end_date = Sys.Date()-1)
 
+repo <- "dtreisman/ManagerScorecards"
+data_tag <- "Data"
+models_tag <- "Models"
+
+# pb_release_create(repo = repo, tag = models_tag)
+# pb_release_create(repo = repo, tag = data_tag)
+
 if (nrow(new_games > 0)) {
   
+  # Get pre-scraped active rosters with positions
+  print("Getting ESPN Rosters...")
+  rosters <- read_csv(url("https://github.com/dtreisman/DailyMLBRosters/raw/main/data/DailyMLBRosters.csv"))
+  pitchers <- rosters %>%
+    filter(pos %in% c("SP", "RP")) %>%
+    mutate(team_abbr = str_to_upper(team_abbr)) %>%
+    select(name, pos, jersey, bats, throws, team_abbr, date, player_id) %>%
+    mutate(date = lubridate::as_date(date),
+           jersey = as.numeric(jersey))
+  
+  
+  # get MLB.com active rosters
+  al_teams <- tibble(baseballr::mlb_teams(season = 2022, league_ids = c(103)))
+  nl_teams <- tibble(baseballr::mlb_teams(season = 2022, league_ids = c(104)))
+  al_teams[which(al_teams$team_abbreviation == "CWS"), "team_abbreviation"] <- "CHW"
+  
+  print("Getting MLB rosters...")
+  mlb_rosters <- tibble()
+  for (day in seq.Date(Sys.Date()-1, Sys.Date()-1, by = "1 day")) { # seq.Date(Sys.Date()-9, Sys.Date()-9, by = "1 day")) {
+    print(as_date(day))
+    for (i in 1:length(c(al_teams$team_abbreviation, nl_teams$team_abbreviation))) {
+      abbrs <- c(al_teams$team_abbreviation, nl_teams$team_abbreviation)
+      ids <- c(al_teams$team_id, nl_teams$team_id)
+      #print(abbrs[i])
+      temp <- mlb_rosters(team_id = c(ids[i]), season = 2022, roster_type = 'active', date = as_date(day))
+      
+      temp <- temp %>%
+        select(person_id, person_full_name, jersey_number) %>%
+        mutate(jersey_number = as.numeric(jersey_number))
+      temp$date <- as_date(day)
+      temp$team <- abbrs[i]
+      mlb_rosters <- bind_rows(mlb_rosters, temp)
+    }
+    
+  }
+  
+  print("Rosters complete.")
+  
+  pb_download(file = "MLBRosters.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
+  all_mlb_rosters <- readRDS("data/MLBRosters.Rds")
+  all_mlb_rosters <- bind_rows(all_mlb_rosters, mlb_rosters)
+  saveRDS(object = all_mlb_rosters, file = "data/MLBRosters.Rds")
+  pb_upload(file = "data/MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+  
+  
+  
+  print("Getting old raw games...")
+  pb_download(file = "df_current.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
   df_current <- readRDS(file = "data/df_current.Rds")
   df_current <- bind_rows(df_current, new_games)
-  df_current <- saveRDS(object = df_current, file = "data/df_current.Rds")
-  googledrive::drive_download("https://drive.google.com/file/d/1MisIarJqBGJiB_0qPhE8RTihaFhB0_JT/view?usp=sharing",
-                              path = here::here(), overwrite = T)
+  saveRDS(object = df_current, file = "data/df_current.Rds")
+  pb_upload(file = "data/df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+  
+  rm(test)
   
   new_games <- new_games %>%#scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-9, end_date = Sys.Date()-9) %>%
     filter(events != "", !is.na(events)) %>%
     mutate(inning = ifelse(inning > 9, 10, inning),
            inning = as.factor(inning),
            game_date_string = str_remove_all(game_date, "-"),
-           game_id = paste0(game_date_string, "_", home_team, "_", away_team)) 
+           game_id = paste0(game_date_string, "_", home_team, "_", away_team))
   
   # new_games <- pullPitcherPBP(2022)
   # new_games <- new_games %>%
@@ -70,7 +102,7 @@ if (nrow(new_games > 0)) {
   #   mutate(inning = ifelse(inning > 9, 10, inning),
   #          inning = as.factor(inning),
   #          game_date_string = str_remove_all(game_date, "-"),
-  #          game_id = paste0(game_date_string, "_", home_team, "_", away_team)) 
+  #          game_id = paste0(game_date_string, "_", home_team, "_", away_team))
   
   
   
@@ -85,13 +117,15 @@ if (nrow(new_games > 0)) {
   
   
   
-  # 
+  #
   # df_new <- df %>%
   #   bind_rows(df_current) %>%
   #   bind_rows(new_games)%>%
   #   prepareNewData()%>%
   #   mutate(inning = ifelse(inning > 9, 10, inning),
   #          inning = as.factor(inning))
+  print("Begin data prep.")
+  
   
   df_new <- df %>%
     bind_rows(df_current) %>%
@@ -99,34 +133,48 @@ if (nrow(new_games > 0)) {
     mutate(inning = ifelse(inning > 9, 10, inning),
            inning = as.factor(inning))
   
+  
+  print("Augment new data")
   df_new <- augmentNewData(df_new) %>%
     padr::fill_by_value(pitcher_woba, mean(old_games$pitcher_woba)) %>%
     ungroup() %>%
     mutate(woba_diff = pitcher_woba - batter_woba,
            inning = as.factor(inning),
            state = factor(state))
-  
-  
   df_pred <- df_new %>%
-    filter(game_date == new_games$game_date[1]) 
+    filter(game_date == new_games$game_date[1])
   
   
+  pb_download(file = "old_games.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
   old_games <- readRDS(file = "data/old_games.Rds")
-  old_games <- bind_rows(old_games, df_pred) 
+  old_games <- bind_rows(old_games, df_pred)
   saveRDS(object = old_games, file = "data/old_games.Rds")
+  pb_upload(file = "data/df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
   
+  pb_download(file = "win_probability_model.Rds", repo = repo, dest = "./models", 
+              overwrite = T, tag = models_tag)
   fit_wp <- readRDS("models/win_probability_model.Rds")
+  # pb_upload(file = "models/win_probability_model.Rds", repo = repo, tag = models_tag, overwrite = T)
+  
+  pb_download(file = "expected_runs_model.Rds", repo = repo, dest = "./models", 
+              overwrite = T, tag = models_tag)
   fit_runs <- readRDS("models/expected_runs_model.Rds")
+  pb_upload(file = "models/expected_runs_model.Rds", repo = repo, tag = models_tag, overwrite = T)
+  
+  pb_download(file = "expected_pitching_change_model.Rds", repo = repo, dest = "./models", 
+              overwrite = T, tag = models_tag)
   fit_new_pitcher <- readRDS("models/expected_pitching_change_model.Rds")
+  pb_upload(file = "models/expected_pitching_change_model.Rds", repo = repo, 
+            tag = models_tag, overwrite = T)
   
   pred_wp <- predict(fit_wp, df_pred, type = "response")
   pred_runs <- predict(fit_runs, df_pred)
   pred_new_pitcher <- predict(fit_new_pitcher, df_pred, type = "response")
   
   
-  pred_wp_hist <- predict(fit_wp, df_new, type = "response")
-  pred_runs_hist  <- predict(fit_runs, df_new)
-  pred_np_hist  <- predict(fit_new_pitcher, df_new, type = "response")
+  # pred_wp_hist <- predict(fit_wp, df_new, type = "response")
+  # pred_runs_hist  <- predict(fit_runs, df_new)
+  # pred_np_hist  <- predict(fit_new_pitcher, df_new, type = "response")
   
   
   # df_output_history <- df_new %>%
@@ -151,11 +199,10 @@ if (nrow(new_games > 0)) {
   # fill(current_runs, .direction = "downup") %>%
   # mutate(wp_diff = current_wp - max_wp,
   #        runs_diff = min_runs - current_runs,
-  #        runs_diff_adj =  ifelse(new_pitcher == 1, 
+  #        runs_diff_adj =  ifelse(new_pitcher == 1,
   #                                runs_diff * (1 - pred_new_pitcher),
   #                                runs_diff * -pred_new_pitcher)) %>%
   # filter(is_pitching == 1, n_batters > 3)
-  
   
   df_output <- df_pred %>%
     bind_cols(pred_wp) %>%
@@ -179,17 +226,17 @@ if (nrow(new_games > 0)) {
     fill(current_runs, .direction = "downup") %>%
     mutate(wp_diff = current_wp - max_wp,
            runs_diff = min_runs - current_runs,
-           runs_diff_adj =  ifelse(new_pitcher == 1, 
+           runs_diff_adj =  ifelse(new_pitcher == 1,
                                    runs_diff * (1 - pred_new_pitcher),
                                    runs_diff * -pred_new_pitcher)) %>%
     filter(is_pitching == 1)
   
   
-  
+  pb_download(file = "output_history.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
   df_output_history <- readRDS("data/output_history.Rds")
   df_output_history <- bind_rows(df_output_history, df_output)
   saveRDS(object = df_output_history, file = "data/output_history.Rds")
-  
+  pb_upload(file = "data/output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
   
   
   
@@ -200,28 +247,16 @@ if (nrow(new_games > 0)) {
   #          runs_diff_adj = round(runs_diff_adj, 3)) %>%
   #   group_by(pitching_team) %>%
   #   summarise(wp_diff = sum(wp_diff, na.rm = T),
-  #             runs_diff_adj = sum(runs_diff_adj, na.rm = T)) 
+  #             runs_diff_adj = sum(runs_diff_adj, na.rm = T))
+  
   
   dist_history <- df_output_history %>%
     group_by(game_id, pitching_team) %>%
-    summarise(runs_diff = sum(runs_diff)) 
+    summarise(runs_diff_adj = sum(runs_diff_adj))
   
   
-  api_key <- Sys.getenv("TWITTERAPIKEY")
-  api_secret <- Sys.getenv("TWITTERAPISECRET")
-  access_token <- Sys.getenv("TWITTERACCESSTOKEN")
-  access_secret <- Sys.getenv("TWITTERACCESSTOKENSECRET")
-  
-  auth <- rtweet::rtweet_bot(api_key = api_key,
-                             api_secret = api_secret, 
-                             access_token = access_token, 
-                             access_secret = access_secret)
-  
-  rtweet::auth_as(auth)
-  
-  
-  yesterday_games <- mlb_schedule(2022) %>% 
-    filter(date == Sys.Date()-1) %>% 
+  yesterday_games <- mlb_schedule(2022) %>%
+    filter(date == Sys.Date()-1) %>%
     select(game_pk) %>%
     deframe()
   
@@ -237,14 +272,15 @@ if (nrow(new_games > 0)) {
     print(tweet)
     rtweet::post_tweet(tweet)
     
-    Sys.sleep(10)
+    Sys.sleep(31)
   }
   
   
+} else {
+  rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
 }
 
-
-
+Sys.sleep(10)
 
 
 

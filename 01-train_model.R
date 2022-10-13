@@ -3,10 +3,25 @@ library(tidyverse)
 library(lubridate)
 library(slider)
 library(randomForest)
+ 
+source("0x-helper_functions.R")
+ 
+df <- tibble()
 
+for (i in c(2019, 2020, 2021)) {
+  temp <- pullPitcherPBP(i)
+  df <- bind_rows(df, temp)
+}
 
-df <- purrr::map(.x = c(2019, 2020, 2021), .f = pullPitcherPBP)
-df <- select(game_date, game_year, player_name, pitcher, batter, events, description, 
+statcast_19 <- readRDS("C:/Users/dtrei/Documents/papers/Random Data Stuff/R Projects/Baseball/Statcast Data/statcast_2019_pitchers.rds")
+statcast_20 <- readRDS("C:/Users/dtrei/Documents/papers/Random Data Stuff/R Projects/Baseball/Statcast Data/statcast_2020_pitchers.rds")
+statcast_21 <- readRDS("C:/Users/dtrei/Documents/papers/Random Data Stuff/R Projects/Baseball/Statcast Data/statcast_2021_pitchers.rds")
+
+df<- bind_rows(statcast_19, statcast_20, statcast_21)
+rm(statcast_19, statcast_20, statcast_21)
+
+df <- df %>%
+  select(game_date, game_year, game_pk, player_name, pitcher, batter, events, description, 
          stand, p_throws, home_team, away_team, home_score, away_score, 
          on_1b, on_2b, on_3b, outs_when_up, inning, inning_topbot, woba_value,
          bat_score, fld_score, post_bat_score, at_bat_number) %>%
@@ -82,80 +97,6 @@ df_mod <- df %>%
                                "home_team" = "HmTm",
                                "away_team" = "VisTm"))
 
-prepareTrainingData <- function(df) {
-  df <- df %>%
-    arrange(game_date, home_team, away_team, at_bat_number) %>%
-    mutate(game_date_string = str_remove_all(game_date, "-"),
-           game_id = paste0(game_date_string, "_", home_team, "_", away_team),
-           month = month(game_date),
-           pitching_team = ifelse(inning_topbot == "Top", home_team, away_team),
-           win = ifelse(Winner == pitching_team, 1, 0),
-           on_1b = ifelse(is.na(on_1b), 0, 1),
-           on_2b = ifelse(is.na(on_2b), 0, 1),
-           on_3b = ifelse(is.na(on_3b), 0, 1),
-           state = paste0(outs_when_up, on_1b, on_2b, on_3b),
-           score_diff = fld_score - bat_score,
-           platoon = ifelse(stand == p_throws, 1, 0),
-           runs_scored = post_bat_score - bat_score) %>%
-    group_by(pitcher) %>%
-    mutate(pitcher_woba = slider::slide_mean(woba_value,
-                                             before = 100, 
-                                             complete = F, 
-                                             na_rm = T)) %>%
-    group_by(batter) %>%
-    mutate(batter_woba = slider::slide_mean(woba_value,
-                                            before = 100, 
-                                            complete = F, 
-                                            na_rm = T)) %>%
-    group_by(pitcher, game_id) %>%
-    #arrange(game_date, inning, desc(inning_topbot)) %>%
-    padr::fill_by_value(woba_value, 0) %>%
-    mutate(one = 1,
-           n_batters = cumsum(one),
-           pitcher_game_woba = cummean(woba_value)*n_batters) %>%
-    ungroup()
-  
-  return(df)
-}
-prepareNewData <- function(df) {
-  df <- df %>%
-    select(game_date, game_year, player_name, pitcher, batter, events, description, 
-           stand, p_throws, home_team, away_team, home_score, away_score, 
-           on_1b, on_2b, on_3b, outs_when_up, inning, inning_topbot, woba_value,
-           bat_score, fld_score, post_bat_score, at_bat_number) %>%
-    arrange(game_date, home_team, away_team, at_bat_number) %>%
-    mutate(game_date_string = str_remove_all(game_date, "-"),
-           game_id = paste0(game_date_string, "_", home_team, "_", away_team),
-           month = month(game_date),
-           pitching_team = ifelse(inning_topbot == "Top", home_team, away_team),
-           on_1b = ifelse(is.na(on_1b), 0, 1),
-           on_2b = ifelse(is.na(on_2b), 0, 1),
-           on_3b = ifelse(is.na(on_3b), 0, 1),
-           state = paste0(outs_when_up, on_1b, on_2b, on_3b),
-           score_diff = fld_score - bat_score,
-           platoon = ifelse(stand == p_throws, 1, 0),
-           runs_scored = post_bat_score - bat_score) %>%
-    group_by(pitcher) %>%
-    mutate(pitcher_woba = slider::slide_mean(woba_value,
-                                             before = 100, 
-                                             complete = F, 
-                                             na_rm = T)) %>%
-    group_by(batter) %>%
-    mutate(batter_woba = slider::slide_mean(woba_value,
-                                            before = 100, 
-                                            complete = F, 
-                                            na_rm = T)) %>%
-    group_by(pitcher, game_id) %>%
-    #arrange(game_date, inning, desc(inning_topbot)) %>%
-    padr::fill_by_value(woba_value, 0) %>%
-    mutate(one = 1,
-           n_batters = cumsum(one),
-           pitcher_game_woba = cummean(woba_value)*n_batters) %>%
-    ungroup()
-  
-  return(df)
-}
-
 
 df_mod <- prepareTrainingData(df_mod) %>%
   filter(game_year != 2019) %>%
@@ -183,7 +124,10 @@ df_mod <- df_mod %>%
               select(-c(player_name, one)), by = c("pitcher", "game_date"))
 
 
+
 df_mod$inning <- factor(df_mod$inning, levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+df_mod$state <- factor(df_mod$state)
+
 
 
 train <- df_mod %>% filter(game_year == 2020) %>%
@@ -216,7 +160,7 @@ MLmetrics::RMSE(y_pred = rep(mean(train$runs_scored), nrow(test)), y_true = test
 MLmetrics::LogLoss(y_pred = pred_runs, y_true = test$runs_scored)
 
 MLmetrics::R2_Score(y_pred = pred_runs, y_true = test$runs_scored)
-
+levels(df_new$state)
 
 fit_wp <- glm(win ~ state + inning + inning_topbot + score_diff + 
                 platoon + stand + p_throws + pitcher_woba  + 
@@ -227,10 +171,34 @@ fit_wp <- glm(win ~ state + inning + inning_topbot + score_diff +
 #                  platoon + stand + p_throws + pitcher_woba  + 
 #                  batter_woba + pitcher_game_woba + batter_woba*pitcher_woba +
 #                  days_rest + n_games_last_5 + n_batters, data = df_mod)
-fit_runs <- randomForest(x = df_mod[, c(6, 7, 8, 9, 20, 21, 22, 24, 25, 27, 28, 29, 30, 31)],
-                       y = df_mod$runs_scored, ntree = 50, do.trace = T, mtry = 10)
+
+feats <- c("stand", "p_throws", "inning", "inning_topbot", "state", "score_diff", "platoon", "pitcher_woba",
+         "batter_woba", "pitcher_game_woba", "woba_diff", "days_rest", "n_games_last_5", "n_batters")
+
+
+fit_runs <- randomForest(x = df_mod[feats],
+                       y = df_mod$runs_scored, ntree = 40, do.trace = T, mtry = 10)
+save.image()
+
+np_feats <- c("stand", "p_throws", "inning", "inning_topbot", "state", "score_diff", "platoon",
+           "batter_woba")
+fit_new_pitcher <- glm(new_pitcher ~ stand + p_throws + inning + inning_topbot +
+                         state + score_diff + platoon + batter_woba, data = df_mod, family = "binomial")
+
+# plot(fit_new_pitcher)
+# table(train$new_pitcher)
+# pred_new_pitcher <- predict(fit_new_pitcher, test, type = "response")
+# pred_np_votes <- ifelse(pred_new_pitcher >= 0.5, 1, 0)
+# MLmetrics::LogLoss(y_pred = rep(.1, nrow(test)), y_true = test$new_pitcher)
+# MLmetrics::LogLoss(y_pred = pred_new_pitcher, y_true = test$new_pitcher)
+# MLmetrics::Accuracy(y_pred = pred_np_votes, y_true = test$new_pitcher)
+# table(pred_np_votes, test$new_pitcher)
+
+
 
 saveRDS(object = fit_wp, file = "models/win_probability_model.Rds")
 saveRDS(object = fit_runs, file = "models/expected_runs_model.Rds")
+saveRDS(object = fit_new_pitcher, file = "models/expected_pitching_change_model.Rds")
 
 saveRDS(object = df_mod, file = "data/training_data.Rds")
+
