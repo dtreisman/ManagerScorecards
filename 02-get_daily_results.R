@@ -143,7 +143,8 @@ if (nrow(new_games > 0)) {
            inning = as.factor(inning),
            state = factor(state))
   df_pred <- df_new %>%
-    filter(game_date == new_games$game_date[1])
+    filter(game_date == new_games$game_date[1]) %>%
+    unique()
   
   pb_download(file = "old_games.Rds", repo = repo, overwrite = T, tag = data_tag)
   old_games <- readRDS(file = "old_games.Rds")
