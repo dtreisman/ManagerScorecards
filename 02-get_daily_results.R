@@ -144,6 +144,7 @@ if (nrow(new_games > 0)) {
            state = factor(state))
   df_pred <- df_new %>%
     filter(game_date == new_games$game_date[1]) %>%
+    mutate(player_id = as.character(player_id)) %>%
     unique()
   
   pb_download(file = "old_games.Rds", repo = repo, overwrite = T, tag = data_tag)
