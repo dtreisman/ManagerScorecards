@@ -85,7 +85,7 @@ if (nrow(new_games > 0)) {
   df_current <- bind_rows(df_current, new_games)
   saveRDS(object = df_current, file = "data/df_current.Rds")
   pb_upload(file = "data/df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
-  
+   
   
   new_games <- new_games %>%#scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-9, end_date = Sys.Date()-9) %>%
     filter(events != "", !is.na(events)) %>%
