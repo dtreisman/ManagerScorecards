@@ -56,6 +56,7 @@ jobs:
             lubridate
             slider
             randomForest
+            piggyback
 
       - name: Run daily data pull
         run: Rscript -e 'source("02-get_daily_results.R")'
