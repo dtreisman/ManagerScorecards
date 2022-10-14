@@ -126,7 +126,7 @@ if (nrow(new_games > 0)) {
   print("Begin data prep.")
   
   pb_download(repo = repo, tag = data_tag, file = "prev_2_years.Rds")
-  df <- readRDS("prev_2_years.Rds)
+  df <- readRDS("prev_2_years.Rds")
   
   df_new <- df %>%
     bind_rows(df_current) %>%
