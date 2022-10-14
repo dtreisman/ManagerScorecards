@@ -2,7 +2,7 @@ name: manager-scorecard-bot
 
 on:
   schedule:
-    - cron: '0 14 * * *' # runs at 14:00 UTC (8am Central) everyday
+    - cron: '0 14 * * *' # runs at 14:00 UTC (9am Central) everyday
     
   workflow_dispatch:
     inputs:
