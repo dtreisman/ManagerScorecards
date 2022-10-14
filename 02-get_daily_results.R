@@ -7,19 +7,18 @@ library(rtweet)
 library(randomForest)
 library(piggyback)
 # library(googledrive)
-try(
-  source("0x-helper_functions.R"),
-  silent = F)
-# api_key <- Sys.getenv("TWITTERAPIKEY")
-# api_secret <- Sys.getenv("TWITTERAPISECRET")
-# access_token <- Sys.getenv("TWITTERACCESSTOKEN")
-# access_secret <- Sys.getenv("TWITTERACCESSTOKENSECRET")
+try(source("0x-helper_functions.R"), silent = F)
+
+api_key <- Sys.getenv("TWITTERAPIKEY")
+api_secret <- Sys.getenv("TWITTERAPISECRET")
+access_token <- Sys.getenv("TWITTERACCESSTOKEN")
+access_secret <- Sys.getenv("TWITTERACCESSTOKENSECRET")
 
 
-auth <- rtweet::rtweet_bot(api_key = "HGv6svtblp2qczsKatTx7zm0A",
-                           api_secret = "kyLVZl5rZUu1uoaam1HRFcDyeKNZ3qj8GHtkYAFHO81xIVHK46", 
-                           access_token = "1571933700153032714-HD4LcRZONCLBrQfGs8zum453H3qUby", 
-                           access_secret = "Fv6DEXmAz9a00kUtpNMr3eNSjqjYwre4kqOvWEP4NGWMh")
+auth <- rtweet::rtweet_bot(api_key = api_key,
+                           api_secret = api_secret, 
+                           access_token = access_token, 
+                           access_secret = access_secret)
 
 rtweet::auth_as(auth)
 
