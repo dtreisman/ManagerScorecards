@@ -30,6 +30,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      GITHUB_PAT: ${{ secrets.DANI_GH_TOKEN }}
       TWITTERACCESSTOKEN: ${{ secrets.TWITTERACCESSTOKEN }}
       TWITTERACCESSTOKENSECRET: ${{ secrets.TWITTERACCESSTOKENSECRET }}
       TWITTERAPIKEY: ${{ secrets.TWITTERAPIKEY }}
@@ -58,14 +59,8 @@ jobs:
             randomForest
             piggyback
 
-      - name: Run daily data pull
+      - name: Run daily script
         run: Rscript -e 'source("02-get_daily_results.R")'
           
-      - name: commit files
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add -A
-          git commit -m "update data" -a
-          git push origin main
+
         
