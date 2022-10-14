@@ -58,6 +58,7 @@ jobs:
             slider
             randomForest
             piggyback
+            padr
 
       - name: Run daily script
         run: Rscript -e 'source("02-get_daily_results.R")'
