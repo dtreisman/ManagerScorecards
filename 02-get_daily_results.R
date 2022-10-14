@@ -122,8 +122,11 @@ if (nrow(new_games > 0)) {
   #   prepareNewData()%>%
   #   mutate(inning = ifelse(inning > 9, 10, inning),
   #          inning = as.factor(inning))
+  
   print("Begin data prep.")
   
+  pb_download(repo = repo, tag = data_tag, file = "prev_2_years.Rds")
+  df <- readRDS("prev_2_years.Rds)
   
   df_new <- df %>%
     bind_rows(df_current) %>%
