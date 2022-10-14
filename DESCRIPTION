@@ -17,7 +17,8 @@ Imports:
     slider (>= 0.2.2),
     rtweet (>= 1.0.2),
     randomForest (>= 4.6-14),
-    piggyback (>= 0.1.4)
+    piggyback (>= 0.1.4),
+    padr (>= 0.6.0)
 Encoding: UTF-8-SIG
 LazyData: true
 Roxygen: list(markdown = TRUE)
