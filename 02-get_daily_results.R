@@ -142,13 +142,15 @@ if (nrow(new_games > 0)) {
            state = factor(state))
   df_pred <- df_new %>%
     filter(game_date == new_games$game_date[1])
-  
+  old_games %>%
+    count(game_date) %>%
+    View()
   
   pb_download(file = "old_games.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
   old_games <- readRDS(file = "data/old_games.Rds")
   old_games <- bind_rows(old_games, df_pred)
   saveRDS(object = old_games, file = "data/old_games.Rds")
-  pb_upload(file = "data/df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+  pb_upload(file = "data/old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
   
   pb_download(file = "win_probability_model.Rds", repo = repo, dest = "./models", 
               overwrite = T, tag = models_tag)
