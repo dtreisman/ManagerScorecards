@@ -230,7 +230,7 @@ write_tweet <- function(id, df_output, dist_history){
     
     home_team <- output$home_abbr
     away_team <- output$away_abbr
-    home_Score- output$teams_home_score
+    home_score- output$teams_home_score
     away_score <- output$teams_away_score
     
     game_date <-  paste0(month(as_date(output$game_date_string), label = T), 
