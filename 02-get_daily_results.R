@@ -71,20 +71,20 @@ if (nrow(new_games > 0)) {
   
   print("Rosters complete.")
   
-  pb_download(file = "MLBRosters.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
-  all_mlb_rosters <- readRDS("data/MLBRosters.Rds")
+  pb_download(file = "MLBRosters.Rds", repo = repo, overwrite = T, tag = data_tag)
+  all_mlb_rosters <- readRDS("MLBRosters.Rds")
   all_mlb_rosters <- bind_rows(all_mlb_rosters, mlb_rosters)
-  saveRDS(object = all_mlb_rosters, file = "data/MLBRosters.Rds")
-  pb_upload(file = "data/MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+  saveRDS(object = all_mlb_rosters, file = "MLBRosters.Rds")
+  pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
   
   
   
   print("Getting old raw games...")
-  pb_download(file = "df_current.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
-  df_current <- readRDS(file = "data/df_current.Rds")
+  pb_download(file = "df_current.Rds", repo = repo, overwrite = T, tag = data_tag)
+  df_current <- readRDS(file = "df_current.Rds")
   df_current <- bind_rows(df_current, new_games)
-  saveRDS(object = df_current, file = "data/df_current.Rds")
-  pb_upload(file = "data/df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+  saveRDS(object = df_current, file = "df_current.Rds")
+  pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
    
   
   new_games <- new_games %>%#scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-9, end_date = Sys.Date()-9) %>%
@@ -122,8 +122,11 @@ if (nrow(new_games > 0)) {
   #   prepareNewData()%>%
   #   mutate(inning = ifelse(inning > 9, 10, inning),
   #          inning = as.factor(inning))
+  
   print("Begin data prep.")
   
+  pb_download(repo = repo, tag = data_tag, file = "prev_2_years.Rds")
+  df <- readRDS("prev_2_years.Rds")
   
   df_new <- df %>%
     bind_rows(df_current) %>%
@@ -140,31 +143,30 @@ if (nrow(new_games > 0)) {
            inning = as.factor(inning),
            state = factor(state))
   df_pred <- df_new %>%
-    filter(game_date == new_games$game_date[1])
-  old_games %>%
-    count(game_date) %>%
-    View()
+    filter(game_date == new_games$game_date[1]) %>%
+    mutate(player_id = as.character(player_id)) %>%
+    unique()
   
-  pb_download(file = "old_games.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
-  old_games <- readRDS(file = "data/old_games.Rds")
+  pb_download(file = "old_games.Rds", repo = repo, overwrite = T, tag = data_tag)
+  old_games <- readRDS(file = "old_games.Rds")
   old_games <- bind_rows(old_games, df_pred)
-  saveRDS(object = old_games, file = "data/old_games.Rds")
-  pb_upload(file = "data/old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
+  saveRDS(object = old_games, file = "old_games.Rds")
+  pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
   
-  pb_download(file = "win_probability_model.Rds", repo = repo, dest = "./models", 
+  pb_download(file = "win_probability_model.Rds", repo = repo, 
               overwrite = T, tag = models_tag)
-  fit_wp <- readRDS("models/win_probability_model.Rds")
-  # pb_upload(file = "models/win_probability_model.Rds", repo = repo, tag = models_tag, overwrite = T)
+  fit_wp <- readRDS("win_probability_model.Rds")
+  # pb_upload(file = "win_probability_model.Rds", repo = repo, tag = models_tag, overwrite = T)
   
-  pb_download(file = "expected_runs_model.Rds", repo = repo, dest = "./models", 
+  pb_download(file = "expected_runs_model.Rds", repo = repo,
               overwrite = T, tag = models_tag)
-  fit_runs <- readRDS("models/expected_runs_model.Rds")
-  # pb_upload(file = "models/expected_runs_model.Rds", repo = repo, tag = models_tag, overwrite = T)
+  fit_runs <- readRDS("expected_runs_model.Rds")
+  # pb_upload(file = "expected_runs_model.Rds", repo = repo, tag = models_tag, overwrite = T)
   
-  pb_download(file = "expected_pitching_change_model.Rds", repo = repo, dest = "./models", 
+  pb_download(file = "expected_pitching_change_model.Rds", repo = repo,
               overwrite = T, tag = models_tag)
-  fit_new_pitcher <- readRDS("models/expected_pitching_change_model.Rds")
-  # pb_upload(file = "models/expected_pitching_change_model.Rds", repo = repo,  tag = models_tag, overwrite = T)
+  fit_new_pitcher <- readRDS("expected_pitching_change_model.Rds")
+  # pb_upload(file = "expected_pitching_change_model.Rds", repo = repo,  tag = models_tag, overwrite = T)
   
   pred_wp <- predict(fit_wp, df_pred, type = "response")
   pred_runs <- predict(fit_runs, df_pred)
@@ -231,11 +233,11 @@ if (nrow(new_games > 0)) {
     filter(is_pitching == 1)
   
   
-  pb_download(file = "output_history.Rds", repo = repo, dest = "./data", overwrite = T, tag = data_tag)
-  df_output_history <- readRDS("data/output_history.Rds")
+  pb_download(file = "output_history.Rds", repo = repo, overwrite = T, tag = data_tag)
+  df_output_history <- readRDS("output_history.Rds")
   df_output_history <- bind_rows(df_output_history, df_output)
-  saveRDS(object = df_output_history, file = "data/output_history.Rds")
-  pb_upload(file = "data/output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
+  saveRDS(object = df_output_history, file = "output_history.Rds")
+  pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
   
   
   

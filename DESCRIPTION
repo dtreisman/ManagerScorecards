@@ -12,12 +12,13 @@ Imports:
     rvest (>= 1.0.2),
     tidyverse (>= 1.3.1),
     gt (>= 0.7.0),
-    baseballr (> 1.3.0),
+    baseballr (>= 1.3.0),
     lubridate (>= 1.8.0),
     slider (>= 0.2.2),
     rtweet (>= 1.0.2),
     randomForest (>= 4.6-14),
-    piggyback (>= 0.1.4)
+    piggyback (>= 0.1.4),
+    padr (>= 0.6.0)
 Encoding: UTF-8-SIG
 LazyData: true
 Roxygen: list(markdown = TRUE)
