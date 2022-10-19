@@ -195,7 +195,8 @@ write_tweet <- function(id, df_output, dist_history){
   
   output <- df_output %>%
     separate(game_id, into = c("game_date_string", "home", "away")) %>%
-    left_join(yesterday_scores %>% select(-game_pk), by = c("game_date_string", "home" = "home_abbr", "away" = "away_abbr")) %>%
+    left_join(yesterday_scores %>% select(-game_pk),
+              by = c("game_date_string", "home" = "home_abbr", "away" = "away_abbr")) %>%
     # filter(df_output$game_id %in% )
     filter(is_pitching == 1, n_batters > 3) %>%
     mutate(runs_diff_adj = round(runs_diff_adj, 2)) %>%
@@ -218,8 +219,8 @@ write_tweet <- function(id, df_output, dist_history){
   
   home_team <- output$home
   away_team <- output$away
-  away_score <- output$teams_home_score
-  home_score <- output$teams_away_score
+  home_score <- output$teams_home_score
+  away_score <- output$teams_away_score
   
   
   if (length(names(output)) != 8 | nrow(output) == 0) {
@@ -229,8 +230,8 @@ write_tweet <- function(id, df_output, dist_history){
     
     home_team <- output$home_abbr
     away_team <- output$away_abbr
-    away_score <- output$teams_home_score
-    home_score <- output$teams_away_score
+    home_Score- output$teams_home_score
+    away_score <- output$teams_away_score
     
     game_date <-  paste0(month(as_date(output$game_date_string), label = T), 
                          " ", 
@@ -257,8 +258,8 @@ write_tweet <- function(id, df_output, dist_history){
     home_run_diff <- deframe(output[,5])
     away_run_diff <- deframe(output[,6])
     
-    away_score <- output$teams_home_score
-    home_score <- output$teams_away_score
+    home_score <- output$teams_home_score
+    away_score <- output$teams_away_score
     
     h_percentile <- round(mean(deframe(output[,5]) < dist_history$runs_diff_adj) * 100)
     a_percentile <- round(mean(deframe(output[,6]) < dist_history$runs_diff_adj) * 100)
