@@ -15,7 +15,7 @@ There are two models working together to created "expected runs lost". The first
 
 Predictions were made for expected runs for all plate appearances. Predictions were also made for all other available pitchers on the active roster assuming they were the current pitcher. By comparing the current expected runs to the hypothetical values, the "expected runs lost" is how many expected runs were lost by having the current pitcher in the game as opposed to a different pitcher. 
 
-The second model is the expected pitching change model. The model was trained using similar variables as the model above in order to predict a probability of a pitching change. In order to not over-penalize a manager for making a substitution, the expected runs values were adjusted by whether a pitching change was likely. A manager will get credited (penalized) for more expected runs lost if a pitching change was highly unexpected, and less penalty if the pitching change was likely given the situation.
+The second model is the expected pitching change model. The model was trained using similar variables as the model above in order to predict the probability of a pitching change. In order to not over-penalize a manager for making a substitution, the expected runs values were adjusted by whether a pitching change was likely. A manager will get credited (penalized) for more expected runs lost if a pitching change was highly unexpected, and less penalty if the pitching change was likely given the situation.
 
 The final statistic (xRuns Lost) can be defined as:
 > (max(xRuns<sub>hypothetical</sub>) - xRuns<sub>current</sub>) * abs(is_currently_pitching(0 or 1) - prob_new_pitcher)
