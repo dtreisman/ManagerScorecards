@@ -180,7 +180,7 @@ write_tweet <- function(id, df_output, dist_history){
     select(team_full_name, team_abbreviation)
   
   yesterday_scores <- mlb_schedule(2022) %>% 
-    filter(date == Sys.Date() - 2)  %>% 
+    filter(date == Sys.Date() - 1)  %>% 
     select(game_pk, 
            date, 
            teams_away_team_name, teams_away_score, 
