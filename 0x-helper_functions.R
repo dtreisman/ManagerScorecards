@@ -152,6 +152,7 @@ augmentNewData <- function(df_new){
     #group_by(person_id, name, game_date) %>%
     mutate(days_rest = as.numeric(game_date - lag(game_date)),
            days_rest = ifelse(days_rest > 5, 5, days_rest),
+           days_rest = as.numeric(days_rest),
            one = 1,
            n_games_last_5 = unlist(slide_index(.x = one, .i = game_date, .f = sum, .before = 5))-1) %>%
     ungroup() %>%
