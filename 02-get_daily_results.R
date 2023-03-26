@@ -103,6 +103,7 @@ if (nrow(new_games > 0)) {
   
   print("New Games:")
   print(nrow(new_games))
+  print(unique(new_games$game_id))
   
   # new_games <- pullPitcherPBP(2023)
   # new_games <- new_games %>%
@@ -146,6 +147,7 @@ if (nrow(new_games > 0)) {
   
   print("Full Prepared Dataset Rows:")
   print(nrow(df_new))
+  print(max(df_new$game_date))
   
   
   print("Augment new data")
@@ -158,6 +160,7 @@ if (nrow(new_games > 0)) {
   
   print("Full Augmented Dataset Rows:")
   print(nrow(df_new))
+  print(max(df_new$game_date))
   
   df_pred <- df_new %>%
     filter(game_date == new_games$game_date[1]) %>%
