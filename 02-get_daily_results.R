@@ -75,7 +75,7 @@ if (nrow(new_games > 0)) {
   all_mlb_rosters <- readRDS("MLBRosters.Rds")
   all_mlb_rosters <- bind_rows(all_mlb_rosters, mlb_rosters)
   saveRDS(object = all_mlb_rosters, file = "MLBRosters.Rds")
-  pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+
   
   
   
@@ -84,7 +84,7 @@ if (nrow(new_games > 0)) {
   df_current <- readRDS(file = "df_current.Rds")
   df_current <- bind_rows(df_current, new_games)
   saveRDS(object = df_current, file = "df_current.Rds")
-  pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+
    
   
   new_games <- new_games %>%#scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-9, end_date = Sys.Date()-9) %>%
@@ -151,7 +151,7 @@ if (nrow(new_games > 0)) {
   old_games <- readRDS(file = "old_games.Rds")
   old_games <- bind_rows(old_games, df_pred)
   saveRDS(object = old_games, file = "old_games.Rds")
-  pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
+  
   
   pb_download(file = "win_probability_model.Rds", repo = repo, 
               overwrite = T, tag = models_tag)
@@ -168,8 +168,14 @@ if (nrow(new_games > 0)) {
   fit_new_pitcher <- readRDS("expected_pitching_change_model.Rds")
   # pb_upload(file = "expected_pitching_change_model.Rds", repo = repo,  tag = models_tag, overwrite = T)
   
+  
+  print(str(fit_wp))
   pred_wp <- predict(fit_wp, df_pred, type = "response")
+  
+  print(str(fit_runs))
   pred_runs <- predict(fit_runs, df_pred)
+  
+  print(str(fit_new_pitcher))
   pred_new_pitcher <- predict(fit_new_pitcher, df_pred, type = "response")
   
   
@@ -237,7 +243,7 @@ if (nrow(new_games > 0)) {
   df_output_history <- readRDS("output_history.Rds")
   df_output_history <- bind_rows(df_output_history, df_output)
   saveRDS(object = df_output_history, file = "output_history.Rds")
-  pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
+ 
   
   
   
@@ -282,6 +288,9 @@ if (nrow(new_games > 0)) {
 }
 
 
-
+pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
+pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
 
 
