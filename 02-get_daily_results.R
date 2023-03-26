@@ -169,13 +169,10 @@ if (nrow(new_games > 0)) {
   # pb_upload(file = "expected_pitching_change_model.Rds", repo = repo,  tag = models_tag, overwrite = T)
   
   
-  print(str(fit_wp))
+  print(colSums(is.na(df_pred))
+        
   pred_wp <- predict(fit_wp, df_pred, type = "response")
-  
-  print(str(fit_runs))
   pred_runs <- predict(fit_runs, df_pred)
-  
-  print(str(fit_new_pitcher))
   pred_new_pitcher <- predict(fit_new_pitcher, df_pred, type = "response")
   
   
