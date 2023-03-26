@@ -144,6 +144,8 @@ augmentNewData <- function(df_new){
     # mutate(available = ifelse((pos == "RP" & n_batters_tot == 0) | (pos == "SP" & n_batters_tot > 0), 1, 0)) %>%
     filter(available == 1)
   
+  print(paste("filtered augmented_rows:", as.character(nrow(df_new))))
+  
   df_days_rest_new <- df_new %>%
     filter(is_pitching == 1) %>%
     select(game_pk, game_date, person_id, name, is_pitching) %>%
