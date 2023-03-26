@@ -42,7 +42,7 @@ if (nrow(new_games > 0)) {
     select(name, pos, jersey, bats, throws, team_abbr, date, player_id) %>%
     mutate(date = lubridate::as_date(date),
            jersey = as.numeric(jersey))
-  
+  print(max(pitchers$date))
   
   # get MLB.com active rosters
   al_teams <- tibble(baseballr::mlb_teams(season = 2023, league_ids = c(103)))
@@ -69,6 +69,8 @@ if (nrow(new_games > 0)) {
     
   }
   
+  print(mlb_rosters %>% head(1))
+  print(nrow(mlb_rosters))
   print("Rosters complete.")
   
   pb_download(file = "MLBRosters.Rds", repo = repo, overwrite = T, tag = data_tag)
@@ -142,6 +144,8 @@ if (nrow(new_games > 0)) {
     mutate(woba_diff = pitcher_woba - batter_woba,
            inning = as.factor(inning),
            state = factor(state))
+  
+  
   df_pred <- df_new %>%
     filter(game_date == new_games$game_date[1]) %>%
     mutate(player_id = as.character(player_id)) %>%
