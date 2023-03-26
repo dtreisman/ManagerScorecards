@@ -84,8 +84,13 @@ if (nrow(new_games > 0)) {
   print("Getting old raw games...")
   pb_download(file = "df_current.Rds", repo = repo, overwrite = T, tag = data_tag)
   df_current <- readRDS(file = "df_current.Rds")
+  
+  print("Games until this yesterday:")
+  print(nrow(df_current))
+  
   df_current <- bind_rows(df_current, new_games)
   saveRDS(object = df_current, file = "df_current.Rds")
+  
 
    
   
@@ -95,6 +100,9 @@ if (nrow(new_games > 0)) {
            inning = as.factor(inning),
            game_date_string = str_remove_all(game_date, "-"),
            game_id = paste0(game_date_string, "_", home_team, "_", away_team))
+  
+  print("New Games:")
+  print(nrow(new_games))
   
   # new_games <- pullPitcherPBP(2023)
   # new_games <- new_games %>%
@@ -136,6 +144,9 @@ if (nrow(new_games > 0)) {
     mutate(inning = ifelse(inning > 9, 10, inning),
            inning = as.factor(inning))
   
+  print("Full Prepared Dataset Rows:")
+  print(nrow(df_new))
+  
   
   print("Augment new data")
   df_new <- augmentNewData(df_new) %>%
@@ -145,11 +156,15 @@ if (nrow(new_games > 0)) {
            inning = as.factor(inning),
            state = factor(state))
   
+  print("Full Augmented Dataset Rows:")
+  print(nrow(df_new))
   
   df_pred <- df_new %>%
     filter(game_date == new_games$game_date[1]) %>%
     mutate(player_id = as.character(player_id)) %>%
     unique()
+  
+    
   
   pb_download(file = "old_games.Rds", repo = repo, overwrite = T, tag = data_tag)
   old_games <- readRDS(file = "old_games.Rds")
@@ -172,7 +187,7 @@ if (nrow(new_games > 0)) {
   fit_new_pitcher <- readRDS("expected_pitching_change_model.Rds")
   # pb_upload(file = "expected_pitching_change_model.Rds", repo = repo,  tag = models_tag, overwrite = T)
   
-  
+  print('Prediction Dataset:')
   print(colSums(is.na(df_pred)))
   print(str(df_pred))
   print(nrow(df_pred))
