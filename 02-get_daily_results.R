@@ -45,8 +45,8 @@ if (nrow(new_games > 0)) {
   
   
   # get MLB.com active rosters
-  al_teams <- tibble(baseballr::mlb_teams(season = 2022, league_ids = c(103)))
-  nl_teams <- tibble(baseballr::mlb_teams(season = 2022, league_ids = c(104)))
+  al_teams <- tibble(baseballr::mlb_teams(season = 2023, league_ids = c(103)))
+  nl_teams <- tibble(baseballr::mlb_teams(season = 2023, league_ids = c(104)))
   al_teams[which(al_teams$team_abbreviation == "CWS"), "team_abbreviation"] <- "CHW"
   
   print("Getting MLB rosters...")
@@ -57,7 +57,7 @@ if (nrow(new_games > 0)) {
       abbrs <- c(al_teams$team_abbreviation, nl_teams$team_abbreviation)
       ids <- c(al_teams$team_id, nl_teams$team_id)
       #print(abbrs[i])
-      temp <- mlb_rosters(team_id = c(ids[i]), season = 2022, roster_type = 'active', date = as_date(day))
+      temp <- mlb_rosters(team_id = c(ids[i]), season = 2023, roster_type = 'active', date = as_date(day))
       
       temp <- temp %>%
         select(person_id, person_full_name, jersey_number) %>%
@@ -94,7 +94,7 @@ if (nrow(new_games > 0)) {
            game_date_string = str_remove_all(game_date, "-"),
            game_id = paste0(game_date_string, "_", home_team, "_", away_team))
   
-  # new_games <- pullPitcherPBP(2022)
+  # new_games <- pullPitcherPBP(2023)
   # new_games <- new_games %>%
   #   filter(events != "", !is.na(events)) %>%
   #   mutate(inning = ifelse(inning > 9, 10, inning),
@@ -261,7 +261,7 @@ if (nrow(new_games > 0)) {
     summarise(runs_diff_adj = sum(runs_diff_adj))
   
   
-  yesterday_games <- mlb_schedule(2022) %>%
+  yesterday_games <- mlb_schedule(2023) %>%
     filter(date == Sys.Date()-1) %>%
     select(game_pk) %>%
     deframe()
