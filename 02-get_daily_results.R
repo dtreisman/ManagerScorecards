@@ -170,6 +170,8 @@ if (nrow(new_games > 0)) {
   
   
   print(colSums(is.na(df_pred)))
+  print(str(df_pred))
+  print(nrow(df_pred))
         
   pred_wp <- predict(fit_wp, df_pred, type = "response")
   pred_runs <- predict(fit_runs, df_pred)
