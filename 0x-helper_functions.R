@@ -139,7 +139,7 @@ augmentNewData <- function(df_new){
     ungroup() %>%
     mutate(pitcher_woba = ifelse(pitcher_n_app <= 15, avg_woba, pitcher_woba),
            batter_woba = ifelse(batter_n_app <= 15, avg_woba, batter_woba)) %>%
-    filter(game_year == 2022, !is.na(is_pitching)) %>%
+    filter(game_year == 2023, !is.na(is_pitching)) %>%
     mutate(available = ifelse((pos == "RP" & n_batters_tot == 0) | (is_pitching == 1), 1, 0)) %>%
     # mutate(available = ifelse((pos == "RP" & n_batters_tot == 0) | (pos == "SP" & n_batters_tot > 0), 1, 0)) %>%
     filter(available == 1)
@@ -176,10 +176,10 @@ augmentNewData <- function(df_new){
 
 write_tweet <- function(id, df_output, dist_history){
   
-  team_info <- mlb_teams(season = 2022, sport_ids = 1) %>%
+  team_info <- mlb_teams(season = 2023, sport_ids = 1) %>%
     select(team_full_name, team_abbreviation)
   
-  yesterday_scores <- mlb_schedule(2022) %>% 
+  yesterday_scores <- mlb_schedule(2023) %>% 
     filter(date == Sys.Date() - 1)  %>% 
     select(game_pk, 
            date, 
