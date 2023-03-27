@@ -22,7 +22,7 @@ auth <- rtweet::rtweet_bot(api_key = api_key,
 
 rtweet::auth_as(auth)
 
-new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-1, end_date = Sys.Date()-1)
+new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-2, end_date = Sys.Date()-2)
 
 repo <- "dtreisman/ManagerScorecards"
 data_tag <- "Data"
