@@ -305,13 +305,14 @@ if (nrow(new_games > 0)) {
   
   
 } else {
-  rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
+  #rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
+  print('no games'_
 }
 
 
-pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
-pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
-pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
-pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
+#pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+#pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+#pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
+#pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
 
 
