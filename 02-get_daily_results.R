@@ -308,7 +308,7 @@ if (nrow(new_games > 0)) {
   pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
   pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
 } else {
-  rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-2}."))
+  rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
   print('no games')
 }
 
