@@ -51,7 +51,7 @@ if (nrow(new_games > 0)) {
   
   print("Getting MLB rosters...")
   mlb_rosters <- tibble()
-  for (day in seq.Date(Sys.Date()-1, Sys.Date()-1, by = "1 day")) { # seq.Date(Sys.Date()-9, Sys.Date()-9, by = "1 day")) {
+  for (day in seq.Date(Sys.Date()-2, Sys.Date()-2, by = "1 day")) { # seq.Date(Sys.Date()-9, Sys.Date()-9, by = "1 day")) {
     print(as_date(day))
     for (i in 1:length(c(al_teams$team_abbreviation, nl_teams$team_abbreviation))) {
       abbrs <- c(al_teams$team_abbreviation, nl_teams$team_abbreviation)
@@ -94,7 +94,7 @@ if (nrow(new_games > 0)) {
 
    
   
-  new_games <- new_games %>%#scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-9, end_date = Sys.Date()-9) %>%
+  new_games <- new_games %>%   #scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-9, end_date = Sys.Date()-9) %>%
     filter(events != "", !is.na(events)) %>%
     mutate(inning = ifelse(inning > 9, 10, inning),
            inning = as.factor(inning),
@@ -118,7 +118,7 @@ if (nrow(new_games > 0)) {
   
   
   # old_games <- df_mod %>%
-  #   filter(game_year == year(Sys.Date()) - 1) %>%
+  #   filter(game_year == year(Sys.Date()) - 2) %>%
   #   bind_rows(statcast_22 %>%
   #               mutate(inning = ifelse(inning > 9, 10, inning),
   #                      inning = as.factor(inning))) %>%
@@ -284,7 +284,7 @@ if (nrow(new_games > 0)) {
   
   
   yesterday_games <- mlb_schedule(2023) %>%
-    filter(date == Sys.Date()-1) %>%
+    filter(date == Sys.Date()-2) %>%
     select(game_pk) %>%
     deframe()
   
@@ -303,16 +303,16 @@ if (nrow(new_games > 0)) {
     Sys.sleep(31)
   }
   
-  
-} else {
-  #rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
-  print('no games'_
-}
-
-
 #pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
 #pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
 #pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
 #pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
+} else {
+  #rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-2}."))
+  print('no games')
+}
+
+
+
 
 
