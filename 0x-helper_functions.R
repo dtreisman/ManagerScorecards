@@ -140,9 +140,9 @@ augmentNewData <- function(df_new){
     mutate(pitcher_woba = ifelse(pitcher_n_app <= 15, avg_woba, pitcher_woba),
            batter_woba = ifelse(batter_n_app <= 15, avg_woba, batter_woba)) %>%
     filter(game_year == 2023, !is.na(is_pitching)) %>%
-    mutate(available = ifelse((pos == "RP" & n_batters_tot == 0) | (is_pitching == 1), 1, 0))# %>%
+    mutate(available = ifelse((pos == "RP" & n_batters_tot == 0) | (is_pitching == 1), 1, 0)) %>%
     # mutate(available = ifelse((pos == "RP" & n_batters_tot == 0) | (pos == "SP" & n_batters_tot > 0), 1, 0)) %>%
-    #filter(available == 1)
+    filter(available == 1)
   
   print(paste("filtered augmented_rows:", as.character(nrow(df_new))))
   
