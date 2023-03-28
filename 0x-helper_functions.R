@@ -277,8 +277,6 @@ write_tweet <- function(id, df_output, dist_history){
     
     {away_team} xRuns Lost: {away_run_diff} (Percentile: {a_percentile}%)
     {home_team} xRuns Lost: {home_run_diff} (Percentile: {h_percentile}%)
-
-    #Postseason
     
     "
     ) %>% substr(1, 278)
