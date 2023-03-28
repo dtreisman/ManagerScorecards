@@ -297,12 +297,10 @@ if (nrow(new_games > 0)) {
     
     print(id)
     tweet <- write_tweet(id, df_output, dist_history)
-    if (length(tweet) > 1) {
-      print(tweet)
-      rtweet::post_tweet(tweet)
-    } else {
-      print('error: tweet not posted')
-    }
+    print(tweet)
+    print(length(tweet))
+    rtweet::post_tweet(tweet)
+
     Sys.sleep(31)
   }
   
