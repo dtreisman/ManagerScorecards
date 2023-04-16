@@ -177,13 +177,13 @@ augmentNewData <- function(df_new){
 }
 
 
-write_tweet <- function(id, df_output, dist_history){
+write_tweet <- function(id, df_output, dist_history, days_prev){
   
   team_info <- mlb_teams(season = 2023, sport_ids = 1) %>%
     select(team_full_name, team_abbreviation)
   
   yesterday_scores <- mlb_schedule(2023) %>% 
-    filter(date == Sys.Date() - 1)  %>% 
+    filter(date == Sys.Date() - days_prev)  %>% 
     select(game_pk, 
            date, 
            teams_away_team_name, teams_away_score, 
