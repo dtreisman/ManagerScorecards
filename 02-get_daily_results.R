@@ -22,7 +22,7 @@ auth <- rtweet::rtweet_bot(api_key = api_key,
 
 rtweet::auth_as(auth)
 
-new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-1, end_date = Sys.Date()-1)
+new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-2, end_date = Sys.Date()-2)
 
 repo <- "dtreisman/ManagerScorecards"
 data_tag <- "Data"
@@ -51,7 +51,7 @@ if (nrow(new_games > 0)) {
   
   print("Getting MLB rosters...")
   mlb_rosters <- tibble()
-  for (day in seq.Date(Sys.Date()-1, Sys.Date()-1, by = "1 day")) { # seq.Date(Sys.Date()-9, Sys.Date()-9, by = "1 day")) {
+  for (day in seq.Date(Sys.Date()-2, Sys.Date()-2, by = "1 day")) { # seq.Date(Sys.Date()-9, Sys.Date()-9, by = "1 day")) {
     print(as_date(day))
     for (i in 1:length(c(al_teams$team_abbreviation, nl_teams$team_abbreviation))) {
       abbrs <- c(al_teams$team_abbreviation, nl_teams$team_abbreviation)
@@ -284,7 +284,7 @@ if (nrow(new_games > 0)) {
   
   
   yesterday_games <- mlb_schedule(2023) %>%
-    filter(date == Sys.Date()-1) %>%
+    filter(date == Sys.Date()-2) %>%
     select(game_pk) %>%
     deframe()
   
