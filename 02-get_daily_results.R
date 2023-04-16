@@ -22,7 +22,7 @@ auth <- rtweet::rtweet_bot(api_key = api_key,
 
 rtweet::auth_as(auth)
 
-days_prev <- 2
+days_prev <- 1
 
 new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-days_prev, end_date = Sys.Date()-days_prev)
 
