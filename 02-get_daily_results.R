@@ -70,6 +70,7 @@ if (nrow(new_games > 0)) {
     }
     
   }
+  mlb_rosters[which(mlb_rosters$team == "CHW"), "team"] <- "CWS"
   
   print(mlb_rosters %>% head(1))
   print(nrow(mlb_rosters))
@@ -78,6 +79,7 @@ if (nrow(new_games > 0)) {
   pb_download(file = "MLBRosters.Rds", repo = repo, overwrite = T, tag = data_tag)
   all_mlb_rosters <- readRDS("MLBRosters.Rds")
   all_mlb_rosters <- bind_rows(all_mlb_rosters, mlb_rosters)
+  all_mlb_rosters[which(all_mlb_rosters$team == "CHW"), "team"] <- "CWS"
   saveRDS(object = all_mlb_rosters, file = "MLBRosters.Rds")
 
   
