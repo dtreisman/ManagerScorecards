@@ -194,7 +194,13 @@ write_tweet <- function(id, df_output, dist_history, days_prev){
               by = c("teams_home_team_name" = "team_full_name")) %>%
     mutate(game_date_string = str_remove_all(date, "-"),
            game_id = paste0(game_date_string, "_", home_abbr, "_", away_abbr)) %>%
-    select(game_date_string, game_pk, home_abbr, teams_home_score, away_abbr, teams_away_score) 
+    select(game_date_string, game_pk, home_abbr, teams_home_score, away_abbr, teams_away_score) %>%
+    mutate(home_abbr = ifelse(home_abbr == 'CHW', 'CWS', home_abbr),
+           away_abbr = ifelse(away_abbr == 'CHW', 'CWS', away_abbr),
+           home_abbr = ifelse(home_abbr == 'AZ', 'ARI', home_abbr),
+           away_abbr = ifelse(home_abbr == 'AZ', 'ARI', away_abbr),
+          
+           
   
   output <- df_output %>%
     separate(game_id, into = c("game_date_string", "home", "away")) %>%
