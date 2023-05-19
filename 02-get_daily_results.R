@@ -43,8 +43,7 @@ if (nrow(new_games > 0)) {
     mutate(team_abbr = str_to_upper(team_abbr)) %>%
     select(name, pos, jersey, bats, throws, team_abbr, date, player_id) %>%
     mutate(date = lubridate::as_date(date),
-           jersey = as.numeric(jersey),
-           team_abbr = ifelse(team_abbr == 'CHW', 'CWS', team_abbr))
+           jersey = as.numeric(jersey))
   print(max(pitchers$date))
   
   # get MLB.com active rosters
@@ -84,7 +83,7 @@ if (nrow(new_games > 0)) {
   saveRDS(object = all_mlb_rosters, file = "MLBRosters.Rds")
 
   
-  
+  pitchers[which(pitchers$team_abbr == "CHW"), "team_abbr"] <- "CWS"  
   
   print("Getting old raw games...")
   pb_download(file = "df_current.Rds", repo = repo, overwrite = T, tag = data_tag)
