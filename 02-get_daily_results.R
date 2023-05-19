@@ -22,7 +22,7 @@ auth <- rtweet::rtweet_bot(api_key = api_key,
 
 rtweet::auth_as(auth)
 
-days_prev <- 2
+days_prev <- 1
 
 new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-days_prev, end_date = Sys.Date()-days_prev)
 
@@ -321,20 +321,20 @@ if (nrow(new_games > 0)) {
     print(id)
     tweet <- write_tweet(id, df_output, dist_history, days_prev)
     print(tweet)
-    #if (length(tweet) == 1) {   
-    #  rtweet::post_tweet(tweet)
-    #} else {
-    #  print('error: tweet not posted')
-    #}
-    #Sys.sleep(31)
+    if (length(tweet) == 1) {   
+      rtweet::post_tweet(tweet)
+    } else {
+      print('error: tweet not posted')
+    }
+    Sys.sleep(31)
   }
   
-  #pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
-  #pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
-  #pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
-  #pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
+  pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+  pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+  pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
+  pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
 } else {
-  #rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
+  rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-days_prev}."))
   print('no games')
 }
 
