@@ -22,7 +22,7 @@ auth <- rtweet::rtweet_bot(api_key = api_key,
 
 rtweet::auth_as(auth)
 
-days_prev <- 1
+days_prev <- 2
 
 new_games <- scrape_statcast_savant_pitcher_all(start_date = Sys.Date()-days_prev, end_date = Sys.Date()-days_prev)
 
@@ -71,6 +71,7 @@ if (nrow(new_games > 0)) {
     
   }
   mlb_rosters[which(mlb_rosters$team == "CHW"), "team"] <- "CWS"
+  mlb_rosters[which(mlb_rosters$team == "AZ"), "team"] <- "ARI"
   
   print(mlb_rosters %>% head(1))
   print(nrow(mlb_rosters))
@@ -84,6 +85,8 @@ if (nrow(new_games > 0)) {
 
   
   pitchers[which(pitchers$team_abbr == "CHW"), "team_abbr"] <- "CWS"  
+  pitchers[which(pitchers$team_abbr == "AZ"), "team_abbr"] <- "ARI" 
+  
   
   print("Getting old raw games...")
   pb_download(file = "df_current.Rds", repo = repo, overwrite = T, tag = data_tag)
@@ -142,6 +145,22 @@ if (nrow(new_games > 0)) {
   
   pb_download(repo = repo, tag = data_tag, file = "prev_2_years.Rds")
   df <- readRDS("prev_2_years.Rds")
+  
+  
+  df[which(df$home_team == "CHW"), "home_team"] <- "CWS"  
+  df[which(df$home_team == "AZ"), "home_team"] <- "ARI" 
+  df[which(df$away_team == "CHW"), "away_team"] <- "CWS"  
+  df[which(df$away_team == "AZ"), "away_team"] <- "ARI" 
+  
+  df_current[which(df_current$home_team == "CHW"), "home_team"] <- "CWS"  
+  df_current[which(df_current$home_team == "AZ"), "home_team"] <- "ARI" 
+  df_current[which(df_current$away_team == "CHW"), "away_team"] <- "CWS"  
+  df_current[which(df_current$away_team == "AZ"), "away_team"] <- "ARI" 
+  
+  df_current[which(df_current$home_team == "CHW"), "home_team"] <- "CWS"  
+  df_current[which(df_current$home_team == "AZ"), "home_team"] <- "ARI" 
+  df_current[which(df_current$away_team == "CHW"), "away_team"] <- "CWS"  
+  df_current[which(df_current$away_team == "AZ"), "away_team"] <- "ARI" 
   
   df_new <- df %>%
     bind_rows(df_current) %>%
@@ -302,20 +321,20 @@ if (nrow(new_games > 0)) {
     print(id)
     tweet <- write_tweet(id, df_output, dist_history, days_prev)
     print(tweet)
-    if (length(tweet) == 1) {   
-      rtweet::post_tweet(tweet)
-    } else {
-      print('error: tweet not posted')
-    }
-    Sys.sleep(31)
+    #if (length(tweet) == 1) {   
+    #  rtweet::post_tweet(tweet)
+    #} else {
+    #  print('error: tweet not posted')
+    #}
+    #Sys.sleep(31)
   }
   
-  pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
-  pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
-  pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
-  pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
+  #pb_upload(file = "MLBRosters.Rds", repo = repo, tag = data_tag, overwrite = T)
+  #pb_upload(file = "df_current.Rds", repo = repo, tag = data_tag, overwrite = T)
+  #pb_upload(file = "old_games.Rds", repo = repo, tag = data_tag, overwrite = T)
+  #pb_upload(file = "output_history.Rds", repo = repo, tag = data_tag, overwrite = T)
 } else {
-  rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
+  #rtweet::post_tweet(status = glue::glue("No games yesterday {Sys.Date()-1}."))
   print('no games')
 }
 
