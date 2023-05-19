@@ -43,7 +43,8 @@ if (nrow(new_games > 0)) {
     mutate(team_abbr = str_to_upper(team_abbr)) %>%
     select(name, pos, jersey, bats, throws, team_abbr, date, player_id) %>%
     mutate(date = lubridate::as_date(date),
-           jersey = as.numeric(jersey))
+           jersey = as.numeric(jersey),
+           team_abbr = ifelse(team_abbr == 'CHW', 'CWS', team_abbr))
   print(max(pitchers$date))
   
   # get MLB.com active rosters
