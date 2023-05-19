@@ -198,7 +198,7 @@ write_tweet <- function(id, df_output, dist_history, days_prev){
     mutate(home_abbr = ifelse(home_abbr == 'CHW', 'CWS', home_abbr),
            away_abbr = ifelse(away_abbr == 'CHW', 'CWS', away_abbr),
            home_abbr = ifelse(home_abbr == 'AZ', 'ARI', home_abbr),
-           away_abbr = ifelse(home_abbr == 'AZ', 'ARI', away_abbr),
+           away_abbr = ifelse(home_abbr == 'AZ', 'ARI', away_abbr))
           
            
   
